@@ -178,21 +178,6 @@ def generate_response(prompt):
     )
     return response.choices[0].message.content
 
-# Load previous conversations from a file
-def load_conversations():
-    try:
-        with open('conversations.json', 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
-
-# Save conversations to a file
-def save_conversations(conversations):
-    with open('conversations.json', 'w') as f:
-        json.dump(conversations, f)
-
-# Load previous conversations
-conversations = load_conversations()
 
 # Create a unique session ID for the current user
 if 'session_id' not in st.session_state:
