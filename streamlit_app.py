@@ -5,8 +5,58 @@ from openai import OpenAI
 import uuid 
 import json
 from PyPDF2 import PdfReader
-from docx import Document
+# Initialize conversation history in session state if not present
+if 'conversation_history' not in st.session_state:
+    st.session_state.conversation_history = {}
+if 'current_conversation' not in st.session_state:
+    st.session_state.current_conversation = []
+
+# Create a layout with sidebar for history
+sidebar = st.sidebar
+sidebar.title("Conversation History")
+
+# Function to save conversation to session state
+def save_conversation(title, messages):
+    # Generate unique ID for conversation
+    conversation_id = str(uuid.uuid4())
     
+    # Save to session state
+    st.session_state.conversation_history[conversation_id] = {
+        'title': title,
+        'messages': messages,
+        'timestamp': str(datetime.datetime.now())
+    }
+
+# Display conversations in sidebar
+for conv_id, conv_data in st.session_state.conversation_history.items():
+    if sidebar.button(f"📝 {conv_data['title']}", key=conv_id):
+        # Load selected conversation into current conversation
+        st.session_state.current_conversation = conv_data['messages']
+
+# New conversation button
+if sidebar.button("➕ New Conversation"):
+    # Clear current conversation
+    st.session_state.current_conversation = []
+    
+# Save conversation button (only show if there are messages)
+if st.session_state.current_conversation:
+    if sidebar.button("💾 Save Current Conversation"):
+        title = sidebar.text_input("Enter conversation title:", 
+                                 value=f"Conversation {len(st.session_state.conversation_history) + 1}")
+        if title:
+            save_conversation(title, st.session_state.current_conversation)
+            st.sidebar.success("Conversation saved!")
+
+# Download conversations as JSON
+if st.session_state.conversation_history:
+    if sidebar.button("⬇️ Download All Conversations"):
+        json_str = json.dumps(st.session_state.conversation_history, indent=2)
+        sidebar.download_button(
+            label="Download JSON",
+            file_name="conversations.json",
+            mime="application/json",
+            data=json_str
+        )
 
 # Set up the OpenAI API key
 # OPENAI API KEY
