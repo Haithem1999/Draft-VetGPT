@@ -1,0 +1,11 @@
+streamlit==1.39.0
+openai==1.52.2
+uuid==1.30
+pyPDF2==3.0.1
+fitz==0.0.1.dev2
+frontend==0.0.3
+python-docx==1.1.2
+pandas==2.2.3
+langchain==0.3.5
+pickle4==0.0.1
+langchain-community==0.3.3
