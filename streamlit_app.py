@@ -216,7 +216,7 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.session_id = str(uuid.uuid4())
     # Clear current context if it exists
     if 'current_context' in st.session_state:
-        st.session_state.current_context = None
+        st.session_state.current_context = ""
     st.rerun()
 
 # Display past conversations in sidebar
