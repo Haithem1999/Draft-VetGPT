@@ -15,47 +15,47 @@ if 'current_conversation' not in st.session_state:
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
 
-# Create a layout with sidebar for history
-with st.sidebar:
-    st.title("Conversation History")
+# # Create a layout with sidebar for history
+# with st.sidebar:
+#     st.title("Conversation History")
     
-    # New conversation button at the top
-    if st.button("➕ New Conversation", key="new_chat"):
-        st.session_state.current_conversation = []
-        st.session_state.selected_conversation = None
-        st.rerun()
+#     # New conversation button at the top
+#     if st.button("➕ New Conversation", key="new_chat"):
+#         st.session_state.current_conversation = []
+#         st.session_state.selected_conversation = None
+#         st.rerun()
 
-    # Display conversations in sidebar
-    for conv_id, conv_data in st.session_state.conversation_history.items():
-        if st.button(f"📝 {conv_data['title']}", key=conv_id):
-            st.session_state.current_conversation = conv_data['messages']
-            st.session_state.selected_conversation = conv_id
-            st.rerun()
+#     # Display conversations in sidebar
+#     for conv_id, conv_data in st.session_state.conversation_history.items():
+#         if st.button(f"📝 {conv_data['title']}", key=conv_id):
+#             st.session_state.current_conversation = conv_data['messages']
+#             st.session_state.selected_conversation = conv_id
+#             st.rerun()
 
-    # Save current conversation
-    if st.session_state.current_conversation and not st.session_state.selected_conversation:
-        title = st.text_input("Conversation title:", 
-                            value=f"Conversation {len(st.session_state.conversation_history) + 1}")
-        if st.button("💾 Save Conversation"):
-            conversation_id = str(uuid.uuid4())
-            st.session_state.conversation_history[conversation_id] = {
-                'title': title,
-                'messages': st.session_state.current_conversation,
-                'timestamp': str(datetime.datetime.now())
-            }
-            st.session_state.selected_conversation = conversation_id
-            st.success("Conversation saved!")
-            st.rerun()
+#     # Save current conversation
+#     if st.session_state.current_conversation and not st.session_state.selected_conversation:
+#         title = st.text_input("Conversation title:", 
+#                             value=f"Conversation {len(st.session_state.conversation_history) + 1}")
+#         if st.button("💾 Save Conversation"):
+#             conversation_id = str(uuid.uuid4())
+#             st.session_state.conversation_history[conversation_id] = {
+#                 'title': title,
+#                 'messages': st.session_state.current_conversation,
+#                 'timestamp': str(datetime.datetime.now())
+#             }
+#             st.session_state.selected_conversation = conversation_id
+#             st.success("Conversation saved!")
+#             st.rerun()
 
-    # Download conversations as JSON
-    if st.session_state.conversation_history:
-        json_str = json.dumps(st.session_state.conversation_history, indent=2)
-        st.download_button(
-            label="⬇️ Download Conversations",
-            file_name="conversations.json",
-            mime="application/json",
-            data=json_str
-        )
+#     # Download conversations as JSON
+#     if st.session_state.conversation_history:
+#         json_str = json.dumps(st.session_state.conversation_history, indent=2)
+#         st.download_button(
+#             label="⬇️ Download Conversations",
+#             file_name="conversations.json",
+#             mime="application/json",
+#             data=json_str
+#         )
 
 # Set up the OpenAI API key
 # OPENAI API KEY
