@@ -132,7 +132,7 @@ st.sidebar.title("Conversation History")
 # Create a "New Conversation" button
 if st.sidebar.button("➕ New Conversation"):
     st.session_state.current_context = ""  # Clear document content
-    #st.session_state.uploaded_file = None  # Clear uploaded file
+    st.session_state.uploaded_file = None  # Clear uploaded file
     # Clear the current conversation
     st.session_state.messages = []
     # Generate new session ID
