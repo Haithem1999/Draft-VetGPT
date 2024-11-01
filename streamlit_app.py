@@ -135,7 +135,6 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.messages = []
     # Generate new session ID
     st.session_state.session_id = str(uuid.uuid4())
-    st.rerun()
     # Clear current context and uploaded file when starting a new conversation
     st.session_state.current_context = ""  # Clear document content
     st.session_state.uploaded_file = None  # Clear uploaded file
