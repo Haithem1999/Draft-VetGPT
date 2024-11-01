@@ -5,54 +5,53 @@ from openai import OpenAI
 import uuid 
 import json
 from PyPDF2 import PdfReader
+import datetime
+
 # Initialize conversation history in session state if not present
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = {}
 if 'current_conversation' not in st.session_state:
     st.session_state.current_conversation = []
+if 'selected_conversation' not in st.session_state:
+    st.session_state.selected_conversation = None
 
 # Create a layout with sidebar for history
-sidebar = st.sidebar
-sidebar.title("Conversation History")
-
-# Function to save conversation to session state
-def save_conversation(title, messages):
-    # Generate unique ID for conversation
-    conversation_id = str(uuid.uuid4())
+with st.sidebar:
+    st.title("Conversation History")
     
-    # Save to session state
-    st.session_state.conversation_history[conversation_id] = {
-        'title': title,
-        'messages': messages,
-        'timestamp': str(datetime.datetime.now())
-    }
+    # New conversation button at the top
+    if st.button("➕ New Conversation", key="new_chat"):
+        st.session_state.current_conversation = []
+        st.session_state.selected_conversation = None
+        st.rerun()
 
-# Display conversations in sidebar
-for conv_id, conv_data in st.session_state.conversation_history.items():
-    if sidebar.button(f"📝 {conv_data['title']}", key=conv_id):
-        # Load selected conversation into current conversation
-        st.session_state.current_conversation = conv_data['messages']
+    # Display conversations in sidebar
+    for conv_id, conv_data in st.session_state.conversation_history.items():
+        if st.button(f"📝 {conv_data['title']}", key=conv_id):
+            st.session_state.current_conversation = conv_data['messages']
+            st.session_state.selected_conversation = conv_id
+            st.rerun()
 
-# New conversation button
-if sidebar.button("➕ New Conversation"):
-    # Clear current conversation
-    st.session_state.current_conversation = []
-    
-# Save conversation button (only show if there are messages)
-if st.session_state.current_conversation:
-    if sidebar.button("💾 Save Current Conversation"):
-        title = sidebar.text_input("Enter conversation title:", 
-                                 value=f"Conversation {len(st.session_state.conversation_history) + 1}")
-        if title:
-            save_conversation(title, st.session_state.current_conversation)
-            st.sidebar.success("Conversation saved!")
+    # Save current conversation
+    if st.session_state.current_conversation and not st.session_state.selected_conversation:
+        title = st.text_input("Conversation title:", 
+                            value=f"Conversation {len(st.session_state.conversation_history) + 1}")
+        if st.button("💾 Save Conversation"):
+            conversation_id = str(uuid.uuid4())
+            st.session_state.conversation_history[conversation_id] = {
+                'title': title,
+                'messages': st.session_state.current_conversation,
+                'timestamp': str(datetime.datetime.now())
+            }
+            st.session_state.selected_conversation = conversation_id
+            st.success("Conversation saved!")
+            st.rerun()
 
-# Download conversations as JSON
-if st.session_state.conversation_history:
-    if sidebar.button("⬇️ Download All Conversations"):
+    # Download conversations as JSON
+    if st.session_state.conversation_history:
         json_str = json.dumps(st.session_state.conversation_history, indent=2)
-        sidebar.download_button(
-            label="Download JSON",
+        st.download_button(
+            label="⬇️ Download Conversations",
             file_name="conversations.json",
             mime="application/json",
             data=json_str
@@ -206,6 +205,29 @@ if st.session_state.session_id in conversations:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+# Initialize sidebar for conversation history
+st.sidebar.title("Conversation History")
+
+# Create a "New Conversation" button
+if st.sidebar.button("New Conversation"):
+    # Clear the current conversation
+    st.session_state.messages = []
+    # Generate new session ID
+    st.session_state.session_id = str(uuid.uuid4())
+    # Clear current context if it exists
+    if 'current_context' in st.session_state:
+        st.session_state.current_context = None
+    st.rerun()
+
+# Display past conversations in sidebar
+for session_id, msgs in conversations.items():
+    if msgs:  # Only show sessions that have messages
+        # Get first user message as title, or use session ID if no messages
+        title = next((msg["content"][:30] + "..." for msg in msgs if msg["role"] == "user"), f"Conversation {session_id[:8]}")
+        if st.sidebar.button(title, key=session_id):
+            st.session_state.session_id = session_id
+            st.session_state.messages = msgs
+            st.rerun()
 
 # Chat input
 if prompt := st.chat_input("You:"):
