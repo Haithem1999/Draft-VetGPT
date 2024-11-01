@@ -209,7 +209,7 @@ for message in st.session_state.messages:
 st.sidebar.title("Conversation History")
 
 # Create a "New Conversation" button
-if st.sidebar.button("New Conversation"):
+if st.sidebar.button("➕ New Conversation"):
     # Clear the current conversation
     st.session_state.messages = []
     # Generate new session ID
