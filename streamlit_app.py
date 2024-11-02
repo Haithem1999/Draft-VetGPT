@@ -183,13 +183,3 @@ if prompt := st.chat_input("You:"):
     # Save the updated conversation
     conversations[st.session_state.session_id] = st.session_state.messages
     save_conversations(conversations)
-
-# Add a download button for conversation at the bottom of the sidebar
-with st.sidebar:
-    st.write("---")  # Separator line for better UI
-    st.download_button(
-        "Download Conversation (as JSON)",
-        data=json.dumps(st.session_state.messages, indent=2),
-        file_name="conversation.json",
-        mime="application/json"
-    )
