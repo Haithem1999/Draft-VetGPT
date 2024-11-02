@@ -53,6 +53,18 @@ if "show_content" not in st.session_state:
     st.session_state.show_content = False
 
 
+# Toggle button to display or hide content
+if st.button("Show/Hide File Content"):
+    st.session_state.show_content = not st.session_state.show_content
+
+# Display or hide content based on the toggle state
+if uploaded_file and st.session_state.show_content:
+    st.write(text)
+
+# Initialize session state for chat history
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
 # Button layout with columns
 col1, col2 = st.columns([1, 3])  # Adjust column widths to create space between buttons
 
@@ -69,19 +81,6 @@ with col2:
         file_name="conversation.json",
         mime="application/json"
     )
-
-# Toggle button to display or hide content
-if st.button("Show/Hide File Content"):
-    st.session_state.show_content = not st.session_state.show_content
-
-# Display or hide content based on the toggle state
-if uploaded_file and st.session_state.show_content:
-    st.write(text)
-
-# Initialize session state for chat history
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
-
 # Function to generate response
 def generate_response(prompt):
     # Define the system prompt
