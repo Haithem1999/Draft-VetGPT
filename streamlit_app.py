@@ -28,11 +28,17 @@ if 'documents' not in st.session_state:
     st.session_state.current_context = ""  # Initialize as empty string
     st.session_state.uploaded_file = None  # Initialize uploaded file as None
 
+# Reset document content for each new conversation
+def reset_document():
+    st.session_state.current_context = ""  # Clear document content
+    st.session_state.uploaded_file = None  # Clear uploaded file
+    
 # File upload
 uploaded_file = st.file_uploader("Upload a file", type=["pdf", "docx", "txt"], key="file_uploader")
 
 # If a file is uploaded, process it and store its content
 if uploaded_file:
+    reset_document()
     st.session_state.uploaded_file = uploaded_file  # Store uploaded file in session state
     if uploaded_file.type == "application/pdf":
         pdf_reader = PdfReader(uploaded_file)
@@ -58,7 +64,7 @@ if st.button("Show/Hide File Content"):
 
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
-    st.write(text)
+    st.write(st.session_state.current_context)
 
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
@@ -135,9 +141,8 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.messages = []
     # Generate new session ID
     st.session_state.session_id = str(uuid.uuid4())
-    # Clear current context and uploaded file when starting a new conversation
-    st.session_state.current_context = ""  # Clear document content
-    st.session_state.uploaded_file = None  # Clear uploaded file
+    # Reset document content for new conversation
+    reset_document()
     st.rerun()
 
 # Display past conversations in sidebar
