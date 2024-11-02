@@ -166,3 +166,14 @@ if prompt := st.chat_input("You:"):
     # Save the updated conversation
     conversations[st.session_state.session_id] = st.session_state.messages
     save_conversations(conversations)
+
+# Download conversation button
+if st.button("Download Conversation"):
+    # Save current conversation as a JSON string
+    conversation_json = json.dumps(st.session_state.messages, indent=2)
+    # Provide download button for the conversation
+    st.download_button("Download as JSON", data=conversation_json, file_name="conversation.json", mime="application/json")
+
+    # Alternatively, save as text
+    conversation_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages])
+    st.download_button("Download as Text", data=conversation_text, file_name="conversation.txt", mime="text/plain")
