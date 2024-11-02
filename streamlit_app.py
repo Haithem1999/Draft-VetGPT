@@ -52,22 +52,9 @@ if uploaded_file:
 if "show_content" not in st.session_state:
     st.session_state.show_content = False
 
-# Button layout with columns
-col1, col2 = st.columns([1, 3])  # Adjust column widths to create space between buttons
-
-with col1:
-    # Toggle button to display or hide content
-    if st.button("Show/Hide File Content"):
-        st.session_state.show_content = not st.session_state.show_content
-
-with col2:
-    # Download button for conversation
-    st.download_button(
-        "Download Conversation (as JSON)",
-        data=json.dumps(st.session_state.messages, indent=2),
-        file_name="conversation.json",
-        mime="application/json"
-    )
+# Toggle button to display or hide content
+if st.button("Show/Hide File Content"):
+    st.session_state.show_content = not st.session_state.show_content
 
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
@@ -80,7 +67,7 @@ if 'messages' not in st.session_state:
 # Function to generate response
 def generate_response(prompt):
     # Define the system prompt
-    system_prompt = """ You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
+    system_prompt = """   You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
     
     You are knowledgeable in the care of a wide range of pets, including dogs, cats, small mammals, and other common household pets. When pet owners come to you with symptoms or questions about their pet’s behavior, health, or habits, you ask targeted questions to clarify the issue and offer helpful insights based on known conditions and remedies. You always advise users to seek a licensed veterinarian for a formal diagnosis and treatment plan if the condition seems serious.
     You will also read and analyze uploaded documents from the user and then answer any questions relevant to that document.
@@ -96,9 +83,14 @@ def generate_response(prompt):
     Behavioral Support: Address common behavioral issues and suggest training or management techniques.
     You will interact in a calm, knowledgeable, and supportive tone, ensuring users feel confident in the guidance you provide while always emphasizing the importance of professional veterinary care for proper diagnosis and treatment.
     You will conduct the communication in the French language mainly but if the user prefers English, you will switch to English.
+    
     """
 
-    user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}" if st.session_state.current_context else prompt
+    if st.session_state.current_context:
+        user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
+    else:
+        user_prompt = prompt
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
@@ -134,20 +126,24 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Sidebar for conversation history
+# Initialize sidebar for conversation history
 st.sidebar.title("Conversation History")
 
-# New Conversation button
+# Create a "New Conversation" button
 if st.sidebar.button("➕ New Conversation"):
+    # Clear the current conversation
     st.session_state.messages = []
+    # Generate new session ID
     st.session_state.session_id = str(uuid.uuid4())
-    st.session_state.current_context = ""
-    st.session_state.uploaded_file = None
+    # Clear current context and uploaded file when starting a new conversation
+    st.session_state.current_context = ""  # Clear document content
+    st.session_state.uploaded_file = None  # Clear uploaded file
     st.rerun()
 
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
-    if msgs:
+    if msgs:  # Only show sessions that have messages
+        # Get first user message as title, or use session ID if no messages
         title = next((msg["content"][:30] + "..." for msg in msgs if msg["role"] == "user"), f"Conversation {session_id[:8]}")
         if st.sidebar.button(title, key=session_id):
             st.session_state.session_id = session_id
@@ -166,5 +162,7 @@ if prompt := st.chat_input("You:"):
         message_placeholder.markdown(full_response)
     
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    
+    # Save the updated conversation
     conversations[st.session_state.session_id] = st.session_state.messages
     save_conversations(conversations)
