@@ -165,7 +165,6 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.uploaded_file = None  # Clear uploaded file
     st.rerun()
 
-st.sidebar.write("")
 st.sidebar.write("____")
 
 # Display past conversations in sidebar
