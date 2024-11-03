@@ -60,7 +60,7 @@ if "show_content" not in st.session_state:
 
 # Layout for buttons in a single row using container
 with st.container():
-    col1, col2 = st.columns([1, 1])  # Equal-width columns to align buttons
+    col1, col2 = st.columns([1, 3])  # Equal-width columns to align buttons
 
     with col1:
         # Toggle button to display or hide content
