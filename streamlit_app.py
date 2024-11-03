@@ -166,7 +166,7 @@ if st.sidebar.button("➕ New Conversation"):
     st.rerun()
 
 st.sidebar.write("")
-st.sidebar.write("")
+st.sidebar.write("____")
 
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
