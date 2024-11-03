@@ -14,6 +14,12 @@ if 'current_conversation' not in st.session_state:
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
 
+
+# Initialize session state for chat history
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
+
 # Set up the OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
@@ -52,17 +58,36 @@ if uploaded_file:
 if "show_content" not in st.session_state:
     st.session_state.show_content = False
 
-# Toggle button to display or hide content
-if st.button("Show/Hide File Content"):
-    st.session_state.show_content = not st.session_state.show_content
+# Layout for buttons in a single row using container
+with st.container():
+    col1, spacer, col2 = st.columns([1, 1.15, 1])  # Equal-width columns to align buttons
 
+    with col1:
+        # Toggle button to display or hide content
+        if st.button(" 📝 Show/Hide File Content", key="show_hide_button"):
+            st.session_state.show_content = not st.session_state.show_content
+
+    with col2:
+        # Download button for conversation
+        st.download_button(
+            " ⬇️ Download Conversation",
+            data=json.dumps(st.session_state.messages, indent=2),
+            file_name="conversation.json",
+            mime="application/json", 
+            key="download_button"
+        )
+
+    
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
     st.write(text)
 
-# Initialize session state for chat history
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
+
+# Add space between buttons and chat section
+st.write("")  
+st.write("") 
+st.write("") 
+
 
 # Function to generate response
 def generate_response(prompt):
