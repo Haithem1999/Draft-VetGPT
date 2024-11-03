@@ -163,11 +163,10 @@ if st.sidebar.button("➕ New Conversation"):
     # Clear current context and uploaded file when starting a new conversation
     st.session_state.current_context = ""  # Clear document content
     st.session_state.uploaded_file = None  # Clear uploaded file
-    st.write("")
-    st.write("")
-    st.write("____________")
     st.rerun()
 
+st.sidebar.write("")
+st.sidebar.write("")
 
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
