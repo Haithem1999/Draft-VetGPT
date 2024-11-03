@@ -165,6 +165,10 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.uploaded_file = None  # Clear uploaded file
     st.rerun()
 
+st.write("")
+st.write("")
+st.write("____________")
+
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
     if msgs:  # Only show sessions that have messages
