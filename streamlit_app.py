@@ -14,6 +14,12 @@ if 'current_conversation' not in st.session_state:
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
 
+
+# Initialize session state for chat history
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
+
 # Set up the OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
@@ -75,11 +81,6 @@ with st.container():
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
     st.write(text)
-
-# Initialize session state for chat history
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
-
 
 # Function to generate response
 def generate_response(prompt):
