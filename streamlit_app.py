@@ -82,6 +82,11 @@ with st.container():
 if uploaded_file and st.session_state.show_content:
     st.write(text)
 
+
+# Add space between buttons and chat section
+st.write("")  
+st.write("") 
+
 # Function to generate response
 def generate_response(prompt):
     # Define the system prompt
