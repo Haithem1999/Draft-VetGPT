@@ -70,7 +70,7 @@ with st.container():
     with col2:
         # Download button for conversation
         st.download_button(
-            "⬇️ Download Conversation (JSON)",
+            "⬇️ Download Conversation",
             data=json.dumps(st.session_state.messages, indent=2),
             file_name="conversation.json",
             mime="application/json", 
