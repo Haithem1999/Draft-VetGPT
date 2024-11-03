@@ -64,6 +64,7 @@ if uploaded_file and st.session_state.show_content:
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
+
 # Function to generate response
 def generate_response(prompt):
     # Define the system prompt
@@ -166,4 +167,12 @@ if prompt := st.chat_input("You:"):
     # Save the updated conversation
     conversations[st.session_state.session_id] = st.session_state.messages
     save_conversations(conversations)
+    
+# Download button for conversation
+st.download_button(
+    "Download Conversation (as JSON)",
+    data=json.dumps(st.session_state.messages, indent=2),
+    file_name="conversation.json",
+    mime="application/json"
+)
 
