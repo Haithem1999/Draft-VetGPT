@@ -52,10 +52,6 @@ if uploaded_file:
 if "show_content" not in st.session_state:
     st.session_state.show_content = False
 
-# Toggle button to display or hide content
-if st.button("Show/Hide File Content"):
-    st.session_state.show_content = not st.session_state.show_content
-
 # Layout for buttons in a single row using container
 with st.container():
     col1, col2 = st.columns([1, 1])  # Equal-width columns to align buttons
