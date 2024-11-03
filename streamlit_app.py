@@ -164,6 +164,8 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.current_context = ""  # Clear document content
     st.session_state.uploaded_file = None  # Clear uploaded file
     st.rerun()
+    
+st.sidebar.write("")
 
 st.sidebar.title("Conversation History")
 
