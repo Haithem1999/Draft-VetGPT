@@ -64,7 +64,7 @@ with st.container():
 
     with col1:
         # Toggle button to display or hide content
-        if st.button(" 📝 Show / Hide File Content", key="show_hide_button"):
+        if st.button(" 📝 Show/Hide File Content", key="show_hide_button"):
             st.session_state.show_content = not st.session_state.show_content
 
     with col2:
