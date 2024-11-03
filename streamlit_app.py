@@ -56,6 +56,23 @@ if "show_content" not in st.session_state:
 if st.button("Show/Hide File Content"):
     st.session_state.show_content = not st.session_state.show_content
 
+# Layout for buttons in a single row
+col1, col2 = st.columns([1, 1])  # Equal-width columns to align buttons
+
+with col1:
+    # Toggle button to display or hide content
+    if st.button("Show/Hide File Content"):
+        st.session_state.show_content = not st.session_state.show_content
+
+with col2:
+    # Download button for conversation
+    st.download_button(
+        "Download Conversation (as JSON)",
+        data=json.dumps(st.session_state.messages, indent=2),
+        file_name="conversation.json",
+        mime="application/json"
+    )
+    
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
     st.write(text)
@@ -167,12 +184,3 @@ if prompt := st.chat_input("You:"):
     # Save the updated conversation
     conversations[st.session_state.session_id] = st.session_state.messages
     save_conversations(conversations)
-    
-# Download button for conversation
-st.download_button(
-    "Download Conversation (as JSON)",
-    data=json.dumps(st.session_state.messages, indent=2),
-    file_name="conversation.json",
-    mime="application/json"
-)
-
