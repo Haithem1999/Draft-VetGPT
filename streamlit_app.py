@@ -56,22 +56,24 @@ if "show_content" not in st.session_state:
 if st.button("Show/Hide File Content"):
     st.session_state.show_content = not st.session_state.show_content
 
-# Layout for buttons in a single row
-col1, col2 = st.columns([1, 1])  # Equal-width columns to align buttons
+# Layout for buttons in a single row using container
+with st.container():
+    col1, col2 = st.columns([1, 1])  # Equal-width columns to align buttons
 
-with col1:
-    # Toggle button to display or hide content
-    if st.button("Show/Hide File Content"):
-        st.session_state.show_content = not st.session_state.show_content
+    with col1:
+        # Toggle button to display or hide content
+        if st.button("Show/Hide File Content"):
+            st.session_state.show_content = not st.session_state.show_content
 
-with col2:
-    # Download button for conversation
-    st.download_button(
-        "Download Conversation (as JSON)",
-        data=json.dumps(st.session_state.messages, indent=2),
-        file_name="conversation.json",
-        mime="application/json"
-    )
+    with col2:
+        # Download button for conversation
+        st.download_button(
+            "Download Conversation (as JSON)",
+            data=json.dumps(st.session_state.messages, indent=2),
+            file_name="conversation.json",
+            mime="application/json"
+        )
+
     
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
