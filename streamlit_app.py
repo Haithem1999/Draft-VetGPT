@@ -62,7 +62,7 @@ with st.container():
 
     with col1:
         # Toggle button to display or hide content
-        if st.button("Show/Hide File Content"):
+        if st.button("Show/Hide File Content", key="show_hide_button")):
             st.session_state.show_content = not st.session_state.show_content
 
     with col2:
@@ -71,7 +71,8 @@ with st.container():
             "Download Conversation (as JSON)",
             data=json.dumps(st.session_state.messages, indent=2),
             file_name="conversation.json",
-            mime="application/json"
+            mime="application/json", 
+            key="download_button"
         )
 
     
