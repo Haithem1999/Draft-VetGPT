@@ -152,7 +152,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # Initialize sidebar for conversation history
-st.sidebar.title("Conversation History")
+st.sidebar.title("Add a New Conversations")
 
 # Create a "New Conversation" button
 if st.sidebar.button("➕ New Conversation"):
@@ -166,6 +166,7 @@ if st.sidebar.button("➕ New Conversation"):
     st.rerun()
 
 st.sidebar.write("____")
+st.sidebar.title("Conversation History")
 
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
