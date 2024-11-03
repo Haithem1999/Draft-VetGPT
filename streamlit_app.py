@@ -72,7 +72,7 @@ with st.container():
         st.download_button(
             " ⬇️ Download Conversation",
             data=json.dumps(st.session_state.messages, indent=2),
-            file_name="conversation.json",
+            file_name= f"Conversation_{session_id[:8]}.json",
             mime="application/json", 
             key="download_button"
         )
@@ -169,7 +169,8 @@ if st.sidebar.button("➕ New Conversation"):
 for session_id, msgs in conversations.items():
     if msgs:  # Only show sessions that have messages
         # Get first user message as title, or use session ID if no messages
-        title = next((msg["content"][:30] + "..." for msg in msgs if msg["role"] == "user"), f"Conversation {session_id[:8]}")
+        # title = next((msg["content"][:30] + "..." for msg in msgs if msg["role"] == "user"), f"Conversation {session_id[:8]}")
+        title = f"Conversation_{session_id[:8]}"
         if st.sidebar.button(title, key=session_id):
             st.session_state.session_id = session_id
             st.session_state.messages = msgs
