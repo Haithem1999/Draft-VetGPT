@@ -34,6 +34,10 @@ if 'documents' not in st.session_state:
     st.session_state.current_context = ""  # Initialize as empty string
     st.session_state.uploaded_file = None  # Initialize uploaded file as None
 
+# Create a unique session ID for the current user
+if 'session_id' not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
+
 # File upload
 uploaded_file = st.file_uploader("Upload a file", type=["pdf", "docx", "txt"], key="file_uploader")
 
@@ -137,10 +141,6 @@ def save_conversations(conversations):
 
 # Load previous conversations
 conversations = load_conversations()
-
-# Create a unique session ID for the current user
-if 'session_id' not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
 
 # Load previous messages for this session, if any
 if st.session_state.session_id in conversations:
