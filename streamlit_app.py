@@ -60,7 +60,7 @@ if "show_content" not in st.session_state:
 
 # Layout for buttons in a single row using container
 with st.container():
-    col1, spacer, col2 = st.columns([1, 1.2, 1])  # Equal-width columns to align buttons
+    col1, spacer, col2 = st.columns([1, 1, 1])  # Equal-width columns to align buttons
 
     with col1:
         # Toggle button to display or hide content
@@ -70,7 +70,7 @@ with st.container():
     with col2:
         # Download button for conversation
         st.download_button(
-            "⬇️ Download Conversation",
+            "⬇️ Download Conversation ",
             data=json.dumps(st.session_state.messages, indent=2),
             file_name="conversation.json",
             mime="application/json", 
