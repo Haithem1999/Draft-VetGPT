@@ -124,9 +124,6 @@ def generate_response(prompt):
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
     )
-
-    # Clear the document context after use to prevent repeated analysis
-    st.session_state.current_context = ""
     
     return response.choices[0].message.content
 
