@@ -16,9 +16,6 @@ if 'selected_conversation' not in st.session_state:
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-# Track if document has been used for response
-if 'document_used' not in st.session_state:  
-    st.session_state.document_used = False
     
 
 # Set up the OpenAI API key
@@ -47,16 +44,13 @@ if uploaded_file:
         pdf_reader = PdfReader(uploaded_file)
         text = "".join([page.extract_text() for page in pdf_reader.pages])
         st.session_state.current_context = text  # Store parsed text for chatbot use
-        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         doc = Document(uploaded_file)
         text = "\n".join([para.text for para in doc.paragraphs])
         st.session_state.current_context = text  # Store parsed text for chatbot use
-        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     elif uploaded_file.type == "text/plain":
         text = uploaded_file.read().decode("utf-8")
         st.session_state.current_context = text  # Store parsed text for chatbot use
-        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     else:
         text = "Unsupported file format."
 
@@ -101,7 +95,7 @@ def generate_response(prompt):
     system_prompt = """   You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
     
     You are knowledgeable in the care of a wide range of pets, including dogs, cats, small mammals, and other common household pets. When pet owners come to you with symptoms or questions about their pet’s behavior, health, or habits, you ask targeted questions to clarify the issue and offer helpful insights based on known conditions and remedies. You always advise users to seek a licensed veterinarian for a formal diagnosis and treatment plan if the condition seems serious.
-    You will also read and analyze uploaded documents from the user and then answer any questions relevant to that document.
+    You will also read and analyze uploaded documents from the user and then answer any questions relevant to that document. Only give the analysis once unless the user asks specific follow-up questions. 
 
     Your responses are concise, empathetic, and practical, ensuring pet owners feel supported and informed. You can help with common concerns such as digestive issues (like diarrhea or constipation), urinary problems, infections, injuries, dietary needs, and behavioral concerns, and you can also suggest preventive care and lifestyle adjustments to improve a pet’s overall health. Additionally, you help pet owners understand treatments, medications, and home care, making sure they know the next steps to take for their pets’ well-being.
     
@@ -163,8 +157,7 @@ if st.sidebar.button("➕ New Conversation"):
     # Generate new session ID
     st.session_state.session_id = str(uuid.uuid4())
     # Clear current context and uploaded file when starting a new conversation
-    st.session_state.current_context = ""  # Clear document content
-    st.session_state.document_used = False  # Reset flag for new conversation
+    st.session_state.current_context = " "  # Clear document content
 
     st.rerun()
     
