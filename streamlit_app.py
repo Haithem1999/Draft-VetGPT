@@ -4,7 +4,7 @@ from openai import OpenAI
 import uuid 
 import json
 from PyPDF2 import PdfReader
-import datetime
+from docx import Document
 
 # Initialize conversation history in session state if not present
 if 'conversation_history' not in st.session_state:
@@ -14,11 +14,9 @@ if 'current_conversation' not in st.session_state:
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
 
-
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-
 
 # Set up the OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
@@ -81,22 +79,20 @@ with st.container():
             key="download_button"
         )
 
-    
 # Display or hide content based on the toggle state
 if uploaded_file and st.session_state.show_content:
     st.write(text)
-
 
 # Add space between buttons and chat section
 st.write("")  
 st.write("") 
 st.write("") 
 
-
-# Function to generate response
-def generate_response(prompt):
+# Function to generate response with optional document context usage
+def generate_response(prompt, document_context=None, use_document_context=False):
     # Define the system prompt
-    system_prompt = """   You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
+    system_prompt = """   
+    You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
     
     You are knowledgeable in the care of a wide range of pets, including dogs, cats, small mammals, and other common household pets. When pet owners come to you with symptoms or questions about their pet’s behavior, health, or habits, you ask targeted questions to clarify the issue and offer helpful insights based on known conditions and remedies. You always advise users to seek a licensed veterinarian for a formal diagnosis and treatment plan if the condition seems serious.
     You will also read and analyze uploaded documents from the user and then answer any questions relevant to that document.
@@ -112,19 +108,29 @@ def generate_response(prompt):
     Behavioral Support: Address common behavioral issues and suggest training or management techniques.
     You will interact in a calm, knowledgeable, and supportive tone, ensuring users feel confident in the guidance you provide while always emphasizing the importance of professional veterinary care for proper diagnosis and treatment.
     You will conduct the communication in the French language mainly but if the user prefers English, you will switch to English.
-    
     """
 
-    if st.session_state.current_context:
-        user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
-    else:
-        user_prompt = prompt
+    # Use session state for document context if none is provided
+    if document_context is None:
+        document_context = st.session_state.get("current_context")
 
+    # Build the initial messages list
+    messages = [{"role": "system", "content": system_prompt}]
+    
+    # Include document context only if use_document_context is True
+    if use_document_context and document_context:
+        messages.append({"role": "assistant", "content": f"Document Context: {document_context}"})
+    
+    # Add previous messages for session history and current user prompt
+    messages.extend(st.session_state.messages)
+    messages.append({"role": "user", "content": prompt})
+
+    # Generate a response from the model
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
+        messages=messages
     )
-    return response.choices[0].message.content
+    return response.choices[0].message["content"]
 
 # Load previous conversations from a file
 def load_conversations():
@@ -171,9 +177,7 @@ st.sidebar.title("Conversation History")
 
 # Display past conversations in sidebar
 for session_id, msgs in conversations.items():
-    if msgs:  # Only show sessions that have messages
-        # Get first user message as title, or use session ID if no messages
-        # title = next((msg["content"][:30] + "..." for msg in msgs if msg["role"] == "user"), f"Conversation {session_id[:8]}")
+    if msgs:
         title = f"Conversation_{session_id[:7]}"
         if st.sidebar.button(title, key=session_id):
             st.session_state.session_id = session_id
@@ -188,7 +192,7 @@ if prompt := st.chat_input("You:"):
     
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = generate_response(prompt)
+        full_response = generate_response(prompt, use_document_context=True)  # Set to True only if context is needed
         message_placeholder.markdown(full_response)
     
     st.session_state.messages.append({"role": "assistant", "content": full_response})
