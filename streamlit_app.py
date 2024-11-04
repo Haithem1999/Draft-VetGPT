@@ -13,9 +13,6 @@ if 'current_conversation' not in st.session_state:
     st.session_state.current_conversation = []
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
-# Initialize uploaded_file if not present
-if 'uploaded_file' not in st.session_state:  
-    st.session_state.uploaded_file = None
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -36,7 +33,6 @@ st.write("Welcome to the Veterinarian Chatbot. How can I assist you with your pe
 if 'documents' not in st.session_state:
     st.session_state.documents = {}
     st.session_state.current_context = ""  # Initialize as empty string
-    st.session_state.uploaded_file = None  # Initialize uploaded file as None
 
 # Create a unique session ID for the current user
 if 'session_id' not in st.session_state:
@@ -47,7 +43,6 @@ uploaded_file = st.file_uploader("Upload a file", type=["pdf", "docx", "txt"], k
 
 # If a file is uploaded, process it and store its content
 if uploaded_file:
-    st.session_state.uploaded_file = uploaded_file  # Store uploaded file in session state
     if uploaded_file.type == "application/pdf":
         pdf_reader = PdfReader(uploaded_file)
         text = "".join([page.extract_text() for page in pdf_reader.pages])
@@ -171,7 +166,6 @@ if st.sidebar.button("➕ New Conversation"):
     st.session_state.session_id = str(uuid.uuid4())
     # Clear current context and uploaded file when starting a new conversation
     st.session_state.current_context = ""  # Clear document content
-    st.session_state.uploaded_file = None  # Clear uploaded file
     st.session_state.document_used = False  # Reset flag for new conversation
 
     st.rerun()
