@@ -13,10 +13,12 @@ if 'current_conversation' not in st.session_state:
     st.session_state.current_conversation = []
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
+
+
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-    
+
 
 # Set up the OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
@@ -30,6 +32,7 @@ st.write("Welcome to the Veterinarian Chatbot. How can I assist you with your pe
 if 'documents' not in st.session_state:
     st.session_state.documents = {}
     st.session_state.current_context = ""  # Initialize as empty string
+    st.session_state.uploaded_file = None  # Initialize uploaded file as None
 
 # Create a unique session ID for the current user
 if 'session_id' not in st.session_state:
@@ -40,6 +43,7 @@ uploaded_file = st.file_uploader("Upload a file", type=["pdf", "docx", "txt"], k
 
 # If a file is uploaded, process it and store its content
 if uploaded_file:
+    st.session_state.uploaded_file = uploaded_file  # Store uploaded file in session state
     if uploaded_file.type == "application/pdf":
         pdf_reader = PdfReader(uploaded_file)
         text = "".join([page.extract_text() for page in pdf_reader.pages])
@@ -95,6 +99,7 @@ def generate_response(prompt):
     system_prompt = """   You are a highly intelligent and specialized virtual assistant designed to help pet owners better understand their pet’s health and well-being. Your primary function is to provide accurate, reliable, and timely information regarding a variety of pet-related health issues, including symptoms, causes, preventive care, home remedies, and when to seek veterinary assistance.
     
     You are knowledgeable in the care of a wide range of pets, including dogs, cats, small mammals, and other common household pets. When pet owners come to you with symptoms or questions about their pet’s behavior, health, or habits, you ask targeted questions to clarify the issue and offer helpful insights based on known conditions and remedies. You always advise users to seek a licensed veterinarian for a formal diagnosis and treatment plan if the condition seems serious.
+    You will also read and analyze uploaded documents from the user and then answer any questions relevant to that document.
 
     Your responses are concise, empathetic, and practical, ensuring pet owners feel supported and informed. You can help with common concerns such as digestive issues (like diarrhea or constipation), urinary problems, infections, injuries, dietary needs, and behavioral concerns, and you can also suggest preventive care and lifestyle adjustments to improve a pet’s overall health. Additionally, you help pet owners understand treatments, medications, and home care, making sure they know the next steps to take for their pets’ well-being.
     
@@ -106,11 +111,10 @@ def generate_response(prompt):
     Preventive Care: Offer guidance on nutrition, exercise, and routine check-ups for a healthy pet lifestyle.
     Behavioral Support: Address common behavioral issues and suggest training or management techniques.
     You will interact in a calm, knowledgeable, and supportive tone, ensuring users feel confident in the guidance you provide while always emphasizing the importance of professional veterinary care for proper diagnosis and treatment.
-    You will also read uploaded documents by the user, analyze and answer any questions relevant to these documents if the user requests to. You need to keep up with specific follow-up questions by the user. 
-    
     You will conduct the communication in the French language mainly but if the user prefers English, you will switch to English.
     
     """
+
     if st.session_state.current_context:
         user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
     else:
@@ -118,17 +122,8 @@ def generate_response(prompt):
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            *st.session_state.messages,
-            {"role": "user", "content": prompt},
-        ],
+        messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
     )
-    
-    return response.choices[0].message.content
-
-
-
     return response.choices[0].message.content
 
 # Load previous conversations from a file
@@ -166,8 +161,8 @@ if st.sidebar.button("➕ New Conversation"):
     # Generate new session ID
     st.session_state.session_id = str(uuid.uuid4())
     # Clear current context and uploaded file when starting a new conversation
-    st.session_state.current_context = " "  # Clear document content
-
+    st.session_state.current_context = ""  # Clear document content
+    st.session_state.uploaded_file = None  # Clear uploaded file
     st.rerun()
     
 st.sidebar.write("")
