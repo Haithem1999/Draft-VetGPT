@@ -13,12 +13,16 @@ if 'current_conversation' not in st.session_state:
     st.session_state.current_conversation = []
 if 'selected_conversation' not in st.session_state:
     st.session_state.selected_conversation = None
-
-
+# Initialize uploaded_file if not present
+if 'uploaded_file' not in st.session_state:  
+    st.session_state.uploaded_file = None
 # Initialize session state for chat history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-
+# Track if document has been used for response
+if 'document_used' not in st.session_state:  
+    st.session_state.document_used = False
+    
 
 # Set up the OpenAI API key
 api_key = st.secrets["OPENAI_API_KEY"]
@@ -48,13 +52,16 @@ if uploaded_file:
         pdf_reader = PdfReader(uploaded_file)
         text = "".join([page.extract_text() for page in pdf_reader.pages])
         st.session_state.current_context = text  # Store parsed text for chatbot use
+        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
         doc = Document(uploaded_file)
         text = "\n".join([para.text for para in doc.paragraphs])
         st.session_state.current_context = text  # Store parsed text for chatbot use
+        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     elif uploaded_file.type == "text/plain":
         text = uploaded_file.read().decode("utf-8")
         st.session_state.current_context = text  # Store parsed text for chatbot use
+        st.session_state.document_used = False  # Reset flag when a new document is uploaded
     else:
         text = "Unsupported file format."
 
@@ -115,8 +122,10 @@ def generate_response(prompt):
     
     """
 
-    if st.session_state.current_context:
+    # Include document context only if it hasn't been used yet
+    if st.session_state.current_context and not st.session_state.document_used:
         user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
+        st.session_state.document_used = True  # Mark document as used after including it
     else:
         user_prompt = prompt
 
@@ -163,6 +172,8 @@ if st.sidebar.button("➕ New Conversation"):
     # Clear current context and uploaded file when starting a new conversation
     st.session_state.current_context = ""  # Clear document content
     st.session_state.uploaded_file = None  # Clear uploaded file
+    st.session_state.document_used = False  # Reset flag for new conversation
+
     st.rerun()
     
 st.sidebar.write("")
