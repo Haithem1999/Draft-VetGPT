@@ -130,7 +130,7 @@ def generate_response(prompt, document_context=None, use_document_context=False)
         model="gpt-4o-mini",
         messages=messages
     )
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
 
 # Load previous conversations from a file
 def load_conversations():
