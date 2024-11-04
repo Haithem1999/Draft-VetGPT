@@ -112,20 +112,24 @@ def generate_response(prompt):
     
     """
 
-    if st.session_state.current_context:
-        user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
-    else:
-        user_prompt = prompt
-
+    # Build the initial messages list
+    messages = [{"role": "system", "content": system_prompt}]
+    
+    # Add document context separately if available
+    if st.session_state.get("current_context"):
+        messages.append({"role": "assistant", "content": f"Document Context: {st.session_state.current_context}"})
+    
+    # Add conversation history (if any) and the new user prompt
+    messages.extend(st.session_state.get("messages", []))
+    messages.append({"role": "user", "content": prompt})
+    
+    # Generate a response from the GPT-4-mini model
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-        {"role": "system", "content": system_prompt},
-        *st.session_state.get("messages", []),
-        {"role": "user", "content": user_prompt}
-        ],
+        model="gpt-4-mini",
+        messages=messages
     )
-    return response.choices[0].message.content
+
+    return response.choices[0].message["content"]
 
 # Load previous conversations from a file
 def load_conversations():
