@@ -129,7 +129,7 @@ def generate_response(prompt):
         messages=messages
     )
 
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
 
 # Load previous conversations from a file
 def load_conversations():
