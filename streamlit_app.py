@@ -117,10 +117,8 @@ def generate_response(prompt):
     
     """
 
-    # Include document context only if it hasn't been used yet
-    if st.session_state.current_context and not st.session_state.document_used:
+    if st.session_state.current_context:
         user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
-        st.session_state.document_used = True  # Mark document as used after including it
     else:
         user_prompt = prompt
 
