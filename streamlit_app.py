@@ -111,23 +111,23 @@ def generate_response(prompt):
     You will conduct the communication in the French language mainly but if the user prefers English, you will switch to English.
     
     """
-
-    # Build the initial messages list
-    messages = [{"role": "system", "content": system_prompt}]
-    
-    # Add document context separately if available
     if st.session_state.current_context:
-        messages.append({"role": "assistant", "content": f"Document Context: {st.session_state.current_context}"})
-    
-    # Add conversation history (if any) and the new user prompt
-    messages.extend(st.session_state.get("messages", []))
-    messages.append({"role": "user", "content": prompt})
-    
-    # Generate a response from the GPT-4-mini model
+        user_prompt = f"{prompt}\n\nDocument content for reference: {st.session_state.current_context}"
+    else:
+        user_prompt = prompt
+
     response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=messages
+        messages=[
+            {"role": "system", "content": system_prompt},
+            *st.session_state.messages,
+            {"role": "user", "content": prompt},
+        ],
     )
+    )
+    return response.choices[0].message.content
+
+
 
     return response.choices[0].message.content
 
