@@ -116,7 +116,7 @@ def generate_response(prompt):
     messages = [{"role": "system", "content": system_prompt}]
     
     # Add document context separately if available
-    if st.session_state.get("current_context"):
+    if st.session_state.current_context:
         messages.append({"role": "assistant", "content": f"Document Context: {st.session_state.current_context}"})
     
     # Add conversation history (if any) and the new user prompt
