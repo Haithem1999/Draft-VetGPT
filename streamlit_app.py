@@ -125,7 +125,7 @@ def generate_response(prompt):
     
     # Generate a response from the GPT-4-mini model
     response = client.chat.completions.create(
-        model="gpt-4-mini",
+        model="gpt-4o-mini",
         messages=messages
     )
 
