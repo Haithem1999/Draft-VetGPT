@@ -121,7 +121,7 @@ def generate_response(prompt):
         user_prompt = prompt
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="ft:gpt-4o-mini-2024-07-18:personal::AHYHvnQx",
         messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
     )
     
