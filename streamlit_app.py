@@ -133,7 +133,7 @@ def generate_response(prompt):
 
     response = client.chat.completions.create(
         #model="ft:gpt-4o-mini-2024-07-18:personal::AHYHvnQx",
-        model = "ft:gpt-4o-mini-2024-07-18:personal::AHYHvnQx",
+        model = "gpt-4o-mini",
         messages=[{"role": "system", "content": system_prompt}] + st.session_state.messages + [{"role": "user", "content": user_prompt}],
     )
     
